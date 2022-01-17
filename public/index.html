@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>todo html javascript + golang fiber gorm</title>
+
+    <style>
+        html,body {
+        margin: 0;
+        padding: 0;
+        }
+
+        #task-box {
+        max-width: 600px;
+        margin: 0 auto;
+        }
+
+        table {
+        text-align: center;
+        border: 1px solid #000;
+        }
+
+        th {
+        width: 150px;
+        }
+
+        .btn {
+        display: inline-block;
+        padding: 6px 12px;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        -ms-touch-action: manipulation;
+        touch-action: manipulation;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: none;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        text-decoration: none;
+        }
+
+        .btn-submit {
+        color: #fff;
+        background-color: #5cb85c;
+        border-color: #4cae4c;
+        }
+
+        .btn-primary {
+        color: #fff;
+        background-color: #337ab7;
+        border-color: #2e6da4;
+        }
+
+        .btn-danger {
+        color: #fff;
+        background-color: #d9534f;
+        border-color: #d43f3a;
+        }
+
+        .btn-default {
+        color: #333;
+        background-color: #fff;
+        border-color: #ccc;
+        }
+
+        .btn-sm {
+        padding: 5px 10px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 3px;
+        }
+
+        dialog {
+        min-width: 300px;
+        border: 5px solid #a4aa9d;
+        border-radius: 1rem;
+        z-index: 11;
+        }
+
+        dialog input{
+        width: 100%;
+        height: 1.5rem;
+        border-radius: 4px;
+        }
+
+        #cover{
+        width: 100%;
+        height: 100%;
+        background-color: dimgray;
+        display: none;
+        z-index: 10;
+        position: absolute;
+        top:0;
+        opacity:0.3;
+        }
+
+    </style>
+
+</head>
+<body>
+<hr>
+<div id="task-box">
+    <p>
+        <button onclick="TaskAdd()" class="btn btn-primary btn-sm">Add</button>
+    </p>
+    <table>
+        <tr>
+            <th>id</th>
+            <th>title</th>
+            <th>body</th>
+        </tr>
+    </table>
+</div>
+
+<div id="cover"></div>
+
+<div id="modal">
+    <dialog>
+        <p>Operation</p>
+        <hr>
+
+        <input type="hidden" id="id">
+
+        <p>
+            title: <br>
+            <input type="text" id="title">
+        </p>
+
+        <p>
+            body: <br>
+            <input type="text" id="body">
+        </p>
+
+        <p style="float: right">
+            <button class="btn btn-default" onclick="dialogHide()">close</button>
+            <button class="btn btn-submit" onclick="TaskSubmit()">submit</button>
+        </p>
+    </dialog>
+</div>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script>
+    var dialog = $("dialog");
+
+    var id = $("#id");
+    var title = $("#title");
+    var body = $("#body");
+
+    var host = "http://localhost:3000"
+
+    TaskList();
+
+    function TaskSubmit() {
+        var url = host + "/api/v1/task";
+        // get form content
+        var idVal = id.val();
+        var titleVal = title.val()
+        var bodyVal = body.val()
+
+
+        if (idVal == "") {
+            url = "/api/v1/task"
+        }
+        if (titleVal=="" || bodyVal=="") {
+            alert("Please input information")
+            title.focus()
+            return false
+        }
+        
+        if (idVal == "") {
+            var url = host + "/api/v1/task"
+            const formData = new FormData();
+
+            formData.append("title", titleVal);
+            formData.append("body", bodyVal);
+
+            const response = new XMLHttpRequest();
+            response.open("POST", url);
+            response.send(formData);
+
+            response.onload = (e) => {
+                alert(response.response);
+                window.location.reload()
+            }
+        } else {
+            var url = host + "/api/v1/task"
+            const formData = new FormData();
+
+            formData.append("id", idVal);
+            formData.append("title", titleVal);
+            formData.append("body", bodyVal);
+
+            const response = new XMLHttpRequest();
+            response.open("PUT", url);
+            response.send(formData);
+
+            response.onload = (e) => {
+                alert(response.response);
+                window.location.reload()
+            }
+        }
+    }
+
+    function TaskAdd() {
+        dialogInit()
+        dialogShow()
+    }
+
+    function TaskEdit(idParam) {
+
+//    function TaskEdit(idParam, titleParam, bodyParam) {
+        
+        if (confirm("Confirm edit "  + idParam) == false) {
+            return false
+        }
+
+        dialogInit()
+        dialogShow()
+        id.val(idParam)
+        title.val(titleParam)
+        body.val(bodyParam)
+
+        // response.onload = (e) => {
+        //     alert(response.response);
+        //     window.location.reload()
+        // }
+    }
+
+    function TaskDelete(idParam) {
+        if (confirm("Confirm delete "  + idParam) == false) {
+            return false
+        }
+
+        var url = host + "/api/v1/task"
+        const formData = new FormData();
+
+        formData.append("id", idParam);
+
+        const response = new XMLHttpRequest();
+        response.open("DELETE", url);
+        response.send(formData);
+
+        response.onload = (e) => {
+            alert(response.response);
+            window.location.reload()
+        }
+    }
+
+    function dialogInit() {
+        id.val("")
+        title.val("")
+        body.val("")
+    }
+    
+    function dialogShow() {
+        $("#cover").show()
+        dialog.show()
+    }
+
+    function dialogHide() {
+        $("#cover").hide()
+        dialog.hide()
+    }
+
+    function TaskList() {
+        var url = host + "/api/v1/task"
+        
+        fetch(url)
+        .then(data => data.json())
+        .then((json) => {
+
+            json.forEach(obj => {
+                id1 = ""
+                title1 = ""
+                body1 = ""
+
+                Object.entries(obj).forEach(([key, value]) => {
+                    if (key == "ID") {
+                        id1 = value
+                    }
+                    if (key == "title") {
+                        title1 = value
+                    }
+                    if (key == "body") {
+                        body1 = value
+                    }
+                });
+
+                $("table").append("<tr>\n" +
+                            "            <td>" + id1   + "</td>\n" +
+                            "            <td>" + title1 + "</td>\n" +
+                            "            <td>" + body1  + "</td>\n" +
+                            "            <td><a href='javascript:;' class='btn btn-primary btn-sm'  onclick='TaskEdit(" + id1 + ",\"" + title1 + "\"," + body1 + ")'>Edit</a> | " +
+
+                            "                <a href='javascript:;' class='btn btn-danger btn-sm' onclick='TaskDelete(" + id1 + ")'>Delete</a> </td>" +
+                            "        </tr>")
+
+//                            "            <td><a href='javascript:;' class='btn btn-primary btn-sm'  onclick='TaskEdit(" + id1 + ",\"" + title1 + "\"," + body1 + ")'>Edit</a> | " +
+                            
+           })
+       })
+
+       dialog.hide()
+    }
+</script>
+</body>
+</html>
