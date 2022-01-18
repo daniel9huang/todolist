@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>todo html javascript + golang fiber gorm</title>
+    <title>ToDo List</title>
 
     <style>
         html,body {
@@ -62,7 +62,7 @@
         border-color: #2e6da4;
         }
 
-        .btn-danger {
+        .btn-red {
         color: #fff;
         background-color: #d9534f;
         border-color: #d43f3a;
@@ -112,33 +112,33 @@
 <hr>
 <div id="task-box">
     <p>
-        <button onclick="TaskAdd()" class="btn btn-primary btn-sm">Add</button>
+        <button onclick="TaskAdd()" class="btn btn-primary btn-sm">Add Task</button>
     </p>
     <table>
         <tr>
-            <th>id</th>
-            <th>title</th>
-            <th>body</th>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Body</th>
         </tr>
     </table>
 </div>
 
 <div id="cover"></div>
 
-<div id="modal">
+<div id="form">
     <dialog>
-        <p>Operation</p>
+        <p>Form</p>
         <hr>
 
         <input type="hidden" id="id">
 
         <p>
-            title: <br>
+            New Title: <br>
             <input type="text" id="title">
         </p>
 
         <p>
-            body: <br>
+            New Body: <br>
             <input type="text" id="body">
         </p>
 
@@ -217,9 +217,9 @@
         dialogShow()
     }
 
-    function TaskEdit(idParam) {
+    //function TaskEdit(idParam) {
 
-//    function TaskEdit(idParam, titleParam, bodyParam) {
+    function TaskEdit(idParam, titleParam, bodyParam) {
         
         if (confirm("Confirm edit "  + idParam) == false) {
             return false
@@ -230,11 +230,6 @@
         id.val(idParam)
         title.val(titleParam)
         body.val(bodyParam)
-
-        // response.onload = (e) => {
-        //     alert(response.response);
-        //     window.location.reload()
-        // }
     }
 
     function TaskDelete(idParam) {
@@ -303,11 +298,8 @@
                             "            <td>" + body1  + "</td>\n" +
                             "            <td><a href='javascript:;' class='btn btn-primary btn-sm'  onclick='TaskEdit(" + id1 + ",\"" + title1 + "\"," + body1 + ")'>Edit</a> | " +
 
-                            "                <a href='javascript:;' class='btn btn-danger btn-sm' onclick='TaskDelete(" + id1 + ")'>Delete</a> </td>" +
-                            "        </tr>")
-
-//                            "            <td><a href='javascript:;' class='btn btn-primary btn-sm'  onclick='TaskEdit(" + id1 + ",\"" + title1 + "\"," + body1 + ")'>Edit</a> | " +
-                            
+                            "                <a href='javascript:;' class='btn btn-red btn-sm' onclick='TaskDelete(" + id1 + ")'>Delete</a> </td>" +
+                            "        </tr>")                  
            })
        })
 
